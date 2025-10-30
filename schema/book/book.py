@@ -18,6 +18,9 @@ class BookPublic(BaseModel):
 class BookId(BookSchema):
     id:int
 
+class BookList(BaseModel):
+    books: list[BookPublic]
+
 class BookUpdate(BaseModel):
     title : Optional[str] = None
     author : Optional [str] = None
