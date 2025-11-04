@@ -1,5 +1,5 @@
 from typing import Optional
-import model
+import models
 from schema import BaseModel
 
 class BookSchema(BaseModel):
