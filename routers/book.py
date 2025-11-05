@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.post("/books/", status_code=HTTPStatus.CREATED, response_model=BookPublic)
 def create_book(book: BookSchema, session : Session=Depends(get_db())):
-    db_book = session(
+    db_book = session.scalar(
         select(Book).where(
             (Book.title == book.title) | (Book.author == book.author) | (Book.published_year == book.published_year) | (Book.isbn == book.isbn)
         ))
@@ -38,7 +38,7 @@ def create_book(book: BookSchema, session : Session=Depends(get_db())):
 
 @router.get("/books", response_model=BookList)
 def get_all_books(session: Session = Depends(get_db())):
-    books = session(select(Book))
+    books = session.scalar(select(Book))
     return {"books" : books}
 
 @router.get("/books/{book_id}", response_model=BookPublic)

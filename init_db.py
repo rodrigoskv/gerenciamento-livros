@@ -6,4 +6,4 @@ def create_tables():
     print("criou")
 
 if __name__ == "__main__":
-    create_tables()
+    create_tables(models)
