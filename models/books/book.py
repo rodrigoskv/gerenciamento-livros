@@ -1,4 +1,4 @@
-from sqlalchemy import SmallInteger
+from sqlalchemy import SmallInteger, Column
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
 
@@ -6,9 +6,9 @@ from database import Base
 class Book(Base):
     __tablename__ = "book"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, init=False)
-    title: Mapped[str] = mapped_column(nullable=False)
-    author: Mapped[str] = mapped_column(nullable=False)
-    published_year: Mapped[int] = mapped_column(SmallInteger)
-    isbn: Mapped[str] = mapped_column(unique=True, nullable=False)
+    id: Mapped[int] = Column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = Column(nullable=False)
+    author: Mapped[str] = Column(nullable=False)
+    published_year: Mapped[int] = Column(SmallInteger)
+    isbn: Mapped[str] = Column(unique=True, nullable=False)
 
