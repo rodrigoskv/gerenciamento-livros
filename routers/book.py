@@ -12,16 +12,14 @@ router = APIRouter()
 
 @router.post("/books/", status_code=HTTPStatus.CREATED, response_model=BookPublic)
 def create_book(book: BookSchema, session : Session=Depends(get_db)):
-    db_book = session.scalar(
-        select(Book).where(
-         or_(
-            (Book.title == book.title),
-            (Book.author == book.author),
-            (Book.published_year == book.published_year),
-            (Book.isbn == book.isbn)
-         )
-        )
-    )
+    db_book = session.scalar(select(Book).where(Book.isbn == book.isbn))
+         # or_(
+         #    (Book.title == book.title),
+         #    (Book.author == book.author),
+         #    (Book.published_year == book.published_year),
+         #    (Book.isbn == book.isbn)
+         # )
+    # (print(db_book))
     #se for igual = HTTPException
     #se não, db_book = None
 
