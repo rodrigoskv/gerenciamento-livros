@@ -22,11 +22,10 @@ def create_book(book: BookSchema, session : Session=Depends(get_db)):
          )
         )
     )
+    #se for igual = HTTPException
+    #se não, db_book = None
+
     if db_book:
-        if db_book.title == book.title:
-            raise HTTPException(
-            status_code = HTTPStatus.CONFLICT,
-            detail="O título do livro já existe")
         if db_book.isbn == book.isbn:
             raise HTTPException(
             status_code = HTTPStatus.CONFLICT,
@@ -43,7 +42,7 @@ def create_book(book: BookSchema, session : Session=Depends(get_db)):
 
 @router.get("/books", response_model=BookList)
 def get_all_books(session: Session = Depends(get_db)):
-    books = session.scalar(select(Book))
+    books = session.query(Book).all()
     return {"books" : books}
 
 @router.get("/books/{book_id}", response_model=BookPublic)
@@ -75,12 +74,15 @@ def update_book(book_id: int, book: BookSchema, session : Session=Depends(get_db
 
     return db_book
 
-# @router.delete("/books/{book_id}", response_model=str)
-# def delete_book(book_id : int, session : Session=Depends(get_db)):
-#     db_book = session.scalar(select(Book).where(Book.id == book_id))
-#     if not db_book:
-#         raise HTTPException(
-#             status_code=HTTPStatus.NOT_FOUND,
-#             detail="ID não encontrado"
-#         )
+@router.delete("/books/{book_id}", response_model=str)
+def delete_book(book_id : int, session : Session=Depends(get_db)):
+    db_book = session.scalar(select(Book).where(Book.id == book_id))
+    if not db_book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="ID não encontrado"
+        )
+    session.delete(db_book)
+    session.commit()
 
+    return "Livro deletado"
