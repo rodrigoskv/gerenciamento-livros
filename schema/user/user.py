@@ -7,5 +7,12 @@ class UserSchema(BaseModel):
     password: str
 
 class UserPublic(BaseModel):
+    id:int
     username: str
-    password : str
+
+class UserUpdate(BaseModel):
+    usermame:str
+    password: str
+
+class PasswordUpdate(UserPublic):
+    password:str

@@ -1,4 +1,4 @@
-from sqlalchemy import SmallInteger, Column, Integer
+from sqlalchemy import SmallInteger
 from sqlalchemy.orm import Mapped, mapped_column
 from database import Base
 

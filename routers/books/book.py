@@ -8,9 +8,9 @@ from models.books.book import Book
 from database import get_db
 from schema import *
 
-router = APIRouter()
+book = APIRouter()
 
-@router.post("/books/", status_code=HTTPStatus.CREATED, response_model=BookSchema)
+@book.post("/books/", status_code=HTTPStatus.CREATED, response_model=BookSchema)
 def create_book(book: BookSchema, session : Session=Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.isbn == book.isbn))
          # or_(
@@ -38,12 +38,12 @@ def create_book(book: BookSchema, session : Session=Depends(get_db)):
     return db_book
 
 
-@router.get("/books", response_model=BookList)
+@book.get("/books", response_model=BookList)
 def get_all_books(session: Session = Depends(get_db)):
     books = session.query(Book).all()
     return {"books" : books}
 
-@router.get("/books/{book_id}", response_model=BookSchema)
+@book.get("/books/{book_id}", response_model=BookSchema)
 def get_book_by_id(book_id: int, session : Session=Depends(get_db)):
    db_book = session.scalar(select(Book).where(Book.id == book_id))
    if not db_book:
@@ -53,7 +53,7 @@ def get_book_by_id(book_id: int, session : Session=Depends(get_db)):
        )
    return db_book
 
-@router.put("/books/{book_id}", response_model=BookSchema)
+@book.put("/books/{book_id}", response_model=BookSchema)
 def update_book(book_id: int, book: BookUpdate, session : Session=Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.id == book_id))
     if not db_book:
@@ -72,7 +72,7 @@ def update_book(book_id: int, book: BookUpdate, session : Session=Depends(get_db
 
     return db_book
 
-@router.delete("/books/{book_id}", response_model=str)
+@book.delete("/books/{book_id}", response_model=str)
 def delete_book(book_id : int, session : Session=Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.id == book_id))
     if not db_book:
