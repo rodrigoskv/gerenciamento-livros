@@ -10,7 +10,7 @@ from schema import *
 
 book = APIRouter()
 
-@book.post("/books/", status_code=HTTPStatus.CREATED, response_model=BookSchema)
+@book.post("/books/", status_code=HTTPStatus.CREATED, response_model=Book)
 def create_book(book: BookSchema, session : Session=Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.isbn == book.isbn))
          # or_(
@@ -22,7 +22,7 @@ def create_book(book: BookSchema, session : Session=Depends(get_db)):
     # (print(db_book))
     #se for igual = HTTPException
     #se não, db_book = None
-    #
+
     if db_book:
         if db_book.isbn == book.isbn:
             raise HTTPException(
@@ -43,7 +43,7 @@ def get_all_books(session: Session = Depends(get_db)):
     books = session.query(Book).all()
     return {"books" : books}
 
-@book.get("/books/{book_id}", response_model=BookSchema)
+@book.get("/books/{book_id}", response_model=Book)
 def get_book_by_id(book_id: int, session : Session=Depends(get_db)):
    db_book = session.scalar(select(Book).where(Book.id == book_id))
    if not db_book:
@@ -53,8 +53,8 @@ def get_book_by_id(book_id: int, session : Session=Depends(get_db)):
        )
    return db_book
 
-@book.put("/books/{book_id}", response_model=BookSchema)
-def update_book(book_id: int, book: BookUpdate, session : Session=Depends(get_db)):
+@book.put("/books/{book_id}", response_model=Book)
+def update_book(book_id: int, book: BookSchema, session : Session=Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.id == book_id))
     if not db_book:
         raise HTTPException(

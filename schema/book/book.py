@@ -1,18 +1,20 @@
 from typing import Optional
+import models
 from schema import BaseModel
 
 class BookSchema(BaseModel):
-    id: int
     title : str
     author : str
     published_year : int
     isbn : str
 
+class Book(BookSchema):
+    id:int
+
 class BookList(BaseModel):
-    books: list[BookSchema]
+    books: list[Book]
 
 class BookUpdate(BaseModel):
     title : Optional[str] = None
     author : Optional [str] = None
     published_year : Optional[int]= None
-    isbn : Optional[str]= None

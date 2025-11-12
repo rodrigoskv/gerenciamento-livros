@@ -2,7 +2,6 @@ from typing import Optional
 from schema import BaseModel
 
 class UserSchema(BaseModel):
-    id : int
     username : str
     password: str
 
@@ -10,9 +9,12 @@ class UserPublic(BaseModel):
     id:int
     username: str
 
-class UserUpdate(BaseModel):
-    usermame:str
-    password: str
+class UserId(UserSchema):
+    id:int
 
-class PasswordUpdate(UserPublic):
-    password:str
+class UserUpdate(BaseModel):
+    username:Optional[str]
+    password: Optional[str]
+
+class PasswordUpdate(BaseModel):
+    password: Optional[str] = None
