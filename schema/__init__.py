@@ -20,3 +20,4 @@ class BaseModel(pydantic.BaseModel):
         return cls(**data)
 
 from .book.book import *
+from .user.user import *
