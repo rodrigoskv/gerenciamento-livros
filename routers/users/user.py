@@ -1,20 +1,17 @@
-from http import HTTPStatus
-from fastapi import APIRouter,HTTPException
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
+from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.exc import IntegrityError
 
-from models.users.user import User
-from database import get_db
+from model.users.user import User
 from routers.users.security import *
-from schema.user.user import *
 from schema.token import *
+from schema.user.user import *
 
 user = APIRouter()
 
+
 @user.post("/users/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session=Depends(get_db)):
+def create_user(user: UserSchema, session: Session = Depends(get_db)):
     db_user = session.scalar(select(User).where(User.username == user.username))
     if db_user:
         if db_user.username == user.username:
@@ -22,7 +19,7 @@ def create_user(user: UserSchema, session: Session=Depends(get_db)):
 
     hashed_password = get_password_hash(user.password)
 
-    db_user = User(username = user.username, password = hashed_password)
+    db_user = User(username=user.username, password=hashed_password)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -31,7 +28,8 @@ def create_user(user: UserSchema, session: Session=Depends(get_db)):
 
 
 @user.put("/users/{user_id}", response_model=UserPublic)
-def update_user(user_id : int, user : UserUpdate, session: Session=Depends(get_db), current_user: User = Depends(get_current_user)):
+def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_db),
+                current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail='Permissões insuficientes'
@@ -47,12 +45,12 @@ def update_user(user_id : int, user : UserUpdate, session: Session=Depends(get_d
     except IntegrityError:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail = "Username já existente"
+            detail="Username já existente"
         )
 
 
 @user.delete("/users/{user_id}", response_model=str)
-def delete_user(user_id : int, session : Session = Depends(get_db), current_user : User = Depends(get_current_user)):
+def delete_user(user_id: int, session: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Permissões insuficientes"
@@ -63,18 +61,14 @@ def delete_user(user_id : int, session : Session = Depends(get_db), current_user
     return "Usuário deletado"
 
 
-
 @user.post("/token", response_model=Token)
-def login_for_access_token(form_data : OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
-   db_user = session.scalar(select(User).where(User.username == form_data.username))
-   if not db_user:
-       raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
+    db_user = session.scalar(select(User).where(User.username == form_data.username))
+    if not db_user:
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 
-   if not verify_password(form_data.password, db_user.password):
-       raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
+    if not verify_password(form_data.password, db_user.password):
+        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 
-   access_token = create_access_token(data={'sub':db_user.username})
-   return {'access_token': access_token, 'token_type': 'bearer'}
-
-
-
+    access_token = create_access_token(data={'sub': db_user.username})
+    return {'access_token': access_token, 'token_type': 'bearer'}

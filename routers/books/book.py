@@ -1,35 +1,37 @@
 from http import HTTPStatus
+
 from fastapi import APIRouter, HTTPException
 from fastapi.params import Depends
-from sqlalchemy import select, or_
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models.books.book import Book
 from database import get_db
+from model.books.book import Book
 from schema import *
 
 book = APIRouter()
 
+
 @book.post("/books/", status_code=HTTPStatus.CREATED, response_model=Book)
-def create_book(book: BookSchema, session : Session=Depends(get_db)):
+def create_book(book: BookSchema, session: Session = Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.isbn == book.isbn))
-         # or_(
-         #    (Book.title == book.title),
-         #    (Book.author == book.author),
-         #    (Book.published_year == book.published_year),
-         #    (Book.isbn == book.isbn)
-         # )
+    # or_(
+    #    (Book.title == book.title),
+    #    (Book.author == book.author),
+    #    (Book.published_year == book.published_year),
+    #    (Book.isbn == book.isbn)
+    # )
     # (print(db_book))
-    #se for igual = HTTPException
-    #se não, db_book = None
+    # se for igual = HTTPException
+    # se não, db_book = None
 
     if db_book:
         if db_book.isbn == book.isbn:
             raise HTTPException(
-            status_code = HTTPStatus.CONFLICT,
-            detail="Esse código já existe")
+                status_code=HTTPStatus.CONFLICT,
+                detail="Esse código já existe")
 
-    db_book = Book(title=book.title, author=book.author, published_year = book.published_year, isbn=book.isbn)
+    db_book = Book(title=book.title, author=book.author, published_year=book.published_year, isbn=book.isbn)
 
     session.add(db_book)
     session.commit()
@@ -41,20 +43,22 @@ def create_book(book: BookSchema, session : Session=Depends(get_db)):
 @book.get("/books", response_model=BookList)
 def get_all_books(session: Session = Depends(get_db)):
     books = session.query(Book).all()
-    return {"books" : books}
+    return {"books": books}
+
 
 @book.get("/books/{book_id}", response_model=Book)
-def get_book_by_id(book_id: int, session : Session=Depends(get_db)):
-   db_book = session.scalar(select(Book).where(Book.id == book_id))
-   if not db_book:
-       raise HTTPException(
-           status_code=HTTPStatus.NOT_FOUND,
-           detail="ID não encontrado"
-       )
-   return db_book
+def get_book_by_id(book_id: int, session: Session = Depends(get_db)):
+    db_book = session.scalar(select(Book).where(Book.id == book_id))
+    if not db_book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="ID não encontrado"
+        )
+    return db_book
+
 
 @book.put("/books/{book_id}", response_model=Book)
-def update_book(book_id: int, book: BookSchema, session : Session=Depends(get_db)):
+def update_book(book_id: int, book: BookSchema, session: Session = Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.id == book_id))
     if not db_book:
         raise HTTPException(
@@ -72,8 +76,9 @@ def update_book(book_id: int, book: BookSchema, session : Session=Depends(get_db
 
     return db_book
 
+
 @book.delete("/books/{book_id}", response_model=str)
-def delete_book(book_id : int, session : Session=Depends(get_db)):
+def delete_book(book_id: int, session: Session = Depends(get_db)):
     db_book = session.scalar(select(Book).where(Book.id == book_id))
     if not db_book:
         raise HTTPException(
