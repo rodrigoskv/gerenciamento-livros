@@ -1,4 +1,6 @@
 import pydantic
+
+
 class BaseModel(pydantic.BaseModel):
     @classmethod
     async def from_orm_async(cls, *args, **kwargs):
@@ -18,6 +20,7 @@ class BaseModel(pydantic.BaseModel):
                 for field, value in kwargs.items()},
         }
         return cls(**data)
+
 
 from .book.book import *
 from .user.user import *
