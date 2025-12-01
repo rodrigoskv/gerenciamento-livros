@@ -17,9 +17,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_db)):
         if db_user.username == user.username:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Usuário já existente")
 
-    hashed_password = get_password_hash(user.password)
-
-    db_user = User(username=user.username, password=hashed_password)
+    db_user = User(username = user.username, password = user.password)
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -36,7 +34,7 @@ def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_d
         )
     try:
         current_user.username = user.username
-        current_user.password = get_password_hash(user.password)
+        current_user.password = user.password
         session.commit()
         session.refresh(current_user)
 
@@ -56,7 +54,7 @@ def delete_user(user_id: int, session: Session = Depends(get_db), current_user: 
             status_code=HTTPStatus.FORBIDDEN, detail="Permissões insuficientes"
         )
     session.delete(current_user)
-    session.commit
+    session.commit()
 
     return "Usuário deletado"
 
@@ -67,7 +65,7 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), ses
     if not db_user:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 
-    if not verify_password(form_data.password, db_user.password):
+    if not (form_data.password == db_user.password):
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 
     access_token = create_access_token(data={'sub': db_user.username})

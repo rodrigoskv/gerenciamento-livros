@@ -18,15 +18,14 @@ ALGORITHM = 'HS256'
 # ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
-pwd_context = PasswordHash.recommended()
 
+# pwd_context = PasswordHash.recommended()
 
-def get_password_hash(password: str):
-    return pwd_context.hash(password)
+# def get_password_hash(password: str):
+#     return pwd_context.hash(password)
 
-
-def verify_password(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+# def verify_password(plain_password: str, hashed_password: str):
+#     return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(data: dict):

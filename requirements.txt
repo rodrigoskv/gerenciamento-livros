@@ -1,3 +1,5 @@
+pydantic
+sqlalchemy-utils
 pycparser==2.22
 cffi==1.17.1
 argon2-cffi-bindings==21.2.0
@@ -9,3 +11,6 @@ fastapi
 python-multipart
 PyJWT
 PyMySQL==1.1.1
+bcrypt==4.3.0
+passlib>=1.7.4
+sqlalchemy-utils>=0.41
