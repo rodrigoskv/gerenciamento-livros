@@ -10,12 +10,12 @@ class BookSchema(BaseModel):
     isbn: str
 
 
-class BookId(BookSchema):
+class Book(BookSchema):
     id: int
 
 
 class BookList(BaseModel):
-    books: list[BookId]
+    books: list[Book]
 
 
 class BookUpdate(BaseModel):

@@ -21,6 +21,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_db)):
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
+    session.close()
 
     return db_user
 
@@ -37,6 +38,7 @@ def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_d
         current_user.password = user.password
         session.commit()
         session.refresh(current_user)
+        session.close()
 
         return current_user
 
@@ -55,6 +57,7 @@ def delete_user(user_id: int, session: Session = Depends(get_db), current_user: 
         )
     session.delete(current_user)
     session.commit()
+    session.close()
 
     return "Usuário deletado"
 
