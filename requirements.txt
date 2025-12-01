@@ -8,3 +8,4 @@ uvicorn
 fastapi
 python-multipart
 PyJWT
+PyMySQL==1.1.1
