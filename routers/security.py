@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from model.users.user import User
 
-SECRET_KEY = 'testando'  # provisorio
+SECRET_KEY = '1ff6dbee11cb5774ab94daa7a23585c0d97e1fe95a2f9496cea10a30e1643112' #gerado com secrets e token_hex(32)
 ALGORITHM = 'HS256'
 # ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

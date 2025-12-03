@@ -1,4 +1,5 @@
 from typing import Optional
+
 from schema import BaseModel
 
 class UserSchema(BaseModel):
@@ -18,3 +19,4 @@ class UserUpdate(BaseModel):
 
 class PasswordUpdate(BaseModel):
     password: Optional[str] = None
+
