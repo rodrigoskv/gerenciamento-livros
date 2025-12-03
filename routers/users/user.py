@@ -2,15 +2,16 @@ from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 
-from model.users.user import User
-from routers.users.security import *
+from routers.security import *
+from routers.auth import *
 from schema.token import *
 from schema.user.user import *
+
 
 user = APIRouter()
 
 
-@user.post("/users/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
+@user.post("/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema, session: Session = Depends(get_db)):
     db_user = session.scalar(select(User).where(User.username == user.username))
     if db_user:
@@ -26,7 +27,7 @@ def create_user(user: UserSchema, session: Session = Depends(get_db)):
     return db_user
 
 
-@user.put("/users/{user_id}", response_model=UserPublic)
+@user.put("/{user_id}", response_model=UserPublic)
 def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_db),
                 current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
@@ -49,7 +50,7 @@ def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_d
         )
 
 
-@user.delete("/users/{user_id}", response_model=str)
+@user.delete("/{user_id}", response_model=str)
 def delete_user(user_id: int, session: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(
@@ -62,14 +63,4 @@ def delete_user(user_id: int, session: Session = Depends(get_db), current_user: 
     return "Usuário deletado"
 
 
-@user.post("/token", response_model=Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
-    db_user = session.scalar(select(User).where(User.username == form_data.username))
-    if not db_user:
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 
-    if not (form_data.password == db_user.password):
-        raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
-
-    access_token = create_access_token(data={'sub': db_user.username})
-    return {'access_token': access_token, 'token_type': 'bearer'}

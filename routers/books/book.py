@@ -14,7 +14,7 @@ from database import get_db
 book = APIRouter()
 
 
-@book.post("/books/", responses={
+@book.post("/", responses={
     409: dict(description="Book already registered"),
 }, status_code=HTTPStatus.CREATED)
 def create_book(book: schema.BookSchema, session: Session = Depends(get_db)):
@@ -42,14 +42,14 @@ def create_book(book: schema.BookSchema, session: Session = Depends(get_db)):
     return
 
 
-@book.get("/books", response_model=schema.BookList)
+@book.get("/", response_model=schema.BookList)
 def get_all_books(session: Session = Depends(get_db)):
     books = session.query(model.Book).all()
     session.close()
     return {"books": books}
 
 
-@book.get("/books/{book_id}", response_model=schema.Book)
+@book.get("/{book_id}", response_model=schema.Book)
 def get_book_by_id(book_id: int, session: Session = Depends(get_db)):
     db_book = session.scalar(select(model.Book).where(model.Book.id == book_id))
     if not db_book:
@@ -61,7 +61,7 @@ def get_book_by_id(book_id: int, session: Session = Depends(get_db)):
     return db_book
 
 
-@book.put("/books/{book_id}", response_model=schema.Book)
+@book.put("/{book_id}", response_model=schema.Book)
 def update_book(book_id: int, book: schema.BookSchema, session: Session = Depends(get_db)):
     db_book = session.scalar(select(model.Book).where(model.Book.id == book_id))
     if not db_book:
@@ -82,7 +82,7 @@ def update_book(book_id: int, book: schema.BookSchema, session: Session = Depend
     return db_book
 
 
-@book.delete("/books/{book_id}", response_model=str)
+@book.delete("/{book_id}", response_model=str)
 def delete_book(book_id: int, session: Session = Depends(get_db)):
     db_book = session.scalar(select(model.Book).where(model.Book.id == book_id))
     if not db_book:
