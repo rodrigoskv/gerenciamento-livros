@@ -1,11 +1,8 @@
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.exc import IntegrityError
 
 from routers.security import *
 from schema.token import *
-from schema.user.user import *
-
 
 auth = APIRouter()
 

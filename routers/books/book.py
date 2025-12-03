@@ -1,6 +1,6 @@
-from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.params import Depends
 from http import HTTPStatus
 from sqlalchemy import select
@@ -12,6 +12,7 @@ import schema
 from database import get_db
 
 book = APIRouter()
+FilterPage = Annotated[schema.FilterPage, Query()]
 
 
 @book.post("/", responses={
@@ -45,6 +46,12 @@ def create_book(book: schema.BookSchema, session: Session = Depends(get_db)):
 @book.get("/", response_model=schema.BookList)
 def get_all_books(session: Session = Depends(get_db)):
     books = session.query(model.Book).all()
+    session.close()
+    return {"books": books}
+
+@book.get("/", response_model=schema.BookList)
+def get_book_with_limit(filter_books : FilterPage, session: Session = Depends(get_db)):
+    books = session.query(model.Book).offset(filter_books.offset).limit(filter_books.limit).all()
     session.close()
     return {"books": books}
 
