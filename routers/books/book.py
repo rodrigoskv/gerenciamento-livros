@@ -1,4 +1,3 @@
-
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.params import Depends
@@ -25,7 +24,6 @@ async def create_book(book: schema.BookSchema, session: AsyncSession = Depends(g
         if db_book.isbn == book.isbn:
             raise HTTPException(status.HTTP_409_CONFLICT, "Book already registered")
 
-    print('m', book)
     db_book = model.Book(title=book.title, author=book.author, published_year=book.published_year, isbn=book.isbn)
 
     session.add(db_book)
@@ -80,6 +78,21 @@ async def update_book(book_id: int, book: schema.BookSchema, session: AsyncSessi
     await session.close()
 
     return db_book
+
+@book.get("/{book_id}/user", response_model=schema.UserPublic)
+async def get_book_owner(book_id: int, session: AsyncSession = Depends(get_db)):
+    db_book = await session.scalar(select(model.Book).where(model.Book.id == book_id))
+    if not db_book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Livro não encontrado"
+        )
+    if not db_book.user_id:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="O livro não possuí usuário anexo"
+        )
+    return await schema.UserPublic.from_orm_async(await db_book.a.user)
 
 
 @book.delete("/{book_id}", response_model=str)

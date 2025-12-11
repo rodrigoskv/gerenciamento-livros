@@ -13,6 +13,7 @@ class BookSchema(BaseModel):
 
 class Book(BookSchema):
     id: int
+    user_id: Optional[int] = None
 
 
 class BookList(BaseModel):

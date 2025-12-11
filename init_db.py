@@ -1,13 +1,11 @@
 import asyncio
 
 from database import *
-from model.books.book import Book
-from model.users.user import User
-
+import model
 
 async def create_tables():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all) #dessa forma engloba todos os Base
+        await conn.run_sync(model.Base.metadata.create_all) #dessa forma engloba todos os Base
         print("criou")
 
 

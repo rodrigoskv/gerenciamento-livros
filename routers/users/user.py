@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import model
+import schema
 from routers.security import *
 from routers.auth import *
 from schema.token import *
@@ -50,6 +52,25 @@ async def update_user(user_id: int, user: UserUpdate, session: AsyncSession = De
             detail="Username já existente"
         )
 
+@user.post("/{user_id}/books/{book_id}", response_model=schema.Book)
+async def associate_book_to_user(user_id : int, book_id:int, session: AsyncSession = Depends(get_db)):
+    db_book = await session.scalar(select(model.Book).where(model.Book.id == book_id))
+    if not db_book:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Livro não encontrado"
+        )
+    db_user = session.scalar(select(model.User).where(model.User.id == user_id))
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail="Usuário não encontrado"
+        )
+    db_book.user_id = user_id
+    await session.commit()
+    await session.refresh(db_book)
+    return db_book
+    
 
 @user.delete("/{user_id}", response_model=str)
 async def delete_user(user_id: int, session: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
