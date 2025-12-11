@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import Field
 
 from schema import BaseModel
@@ -16,7 +16,7 @@ class Book(BookSchema):
 
 
 class BookList(BaseModel):
-    books: list[Book]
+    books: List[Book]
 
 
 class BookUpdate(BaseModel):
@@ -26,5 +26,5 @@ class BookUpdate(BaseModel):
     isbn: Optional[str] = None
 
 class FilterPage(BaseModel):
-    offset: int = Field(ge=0, default=0)
-    limit: int = Field(ge=0, default=10)
+    offset: Optional[int] = None
+    limit: Optional[int] = None

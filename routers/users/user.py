@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from routers.security import *
 from routers.auth import *
@@ -12,23 +13,23 @@ user = APIRouter()
 
 
 @user.post("/", status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session: Session = Depends(get_db)):
-    db_user = session.scalar(select(User).where(User.username == user.username))
+async def create_user(user: UserSchema, session: AsyncSession = Depends(get_db)):
+    db_user = await session.scalar(select(User).where(User.username == user.username))
     if db_user:
         if db_user.username == user.username:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Usuário já existente")
 
     db_user = User(username = user.username, password = user.password)
     session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
-    session.close()
+    await session.commit()
+    await session.refresh(db_user)
+    await session.close()
 
     return db_user
 
 
 @user.put("/{user_id}", response_model=UserPublic)
-def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_db),
+async def update_user(user_id: int, user: UserUpdate, session: AsyncSession = Depends(get_db),
                 current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(
@@ -37,9 +38,9 @@ def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_d
     try:
         current_user.username = user.username
         current_user.password = user.password
-        session.commit()
-        session.refresh(current_user)
-        session.close()
+        await session.commit()
+        await session.refresh(current_user)
+        await session.close()
 
         return current_user
 
@@ -51,14 +52,14 @@ def update_user(user_id: int, user: UserUpdate, session: Session = Depends(get_d
 
 
 @user.delete("/{user_id}", response_model=str)
-def delete_user(user_id: int, session: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+async def delete_user(user_id: int, session: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(
             status_code=HTTPStatus.FORBIDDEN, detail="Permissões insuficientes"
         )
-    session.delete(current_user)
-    session.commit()
-    session.close()
+    await session.delete(current_user)
+    await session.commit()
+    await session.close()
 
     return "Usuário deletado"
 

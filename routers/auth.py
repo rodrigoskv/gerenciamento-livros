@@ -7,8 +7,8 @@ from schema.token import *
 auth = APIRouter()
 
 @auth.post("/token", response_model=Token)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
-    db_user = session.scalar(select(User).where(User.username == form_data.username))
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: AsyncSession = Depends(get_db)):
+    db_user = await session.scalar(select(User).where(User.username == form_data.username))
     if not db_user:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED, detail="Email ou senha incorretos")
 

@@ -1,13 +1,15 @@
-from database import engine
+import asyncio
+
+from database import *
 from model.books.book import Book
 from model.users.user import User
 
 
-def create_tables():
-    Book.metadata.create_all(bind=engine)
-    User.metadata.create_all(bind=engine)
-    print("criou")
+async def create_tables():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all) #dessa forma engloba todos os Base
+        print("criou")
 
 
 if __name__ == "__main__":
-    create_tables()
+    asyncio.run(create_tables())

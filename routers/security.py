@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt import encode, decode, DecodeError
 from pwdlib import PasswordHash
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from database import get_db
 from model.users.user import User
@@ -38,7 +38,7 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 
-def get_current_user(session: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+async def get_current_user(session: AsyncSession = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=HTTPStatus.UNAUTHORIZED,
         detail="Não foi possível validar as credenciais",
@@ -54,7 +54,7 @@ def get_current_user(session: Session = Depends(get_db), token: str = Depends(oa
     except DecodeError:
         raise credentials_exception
 
-    user = session.scalar(select(User).where(User.username == subject_username))
+    user = await session.scalar(select(User).where(User.username == subject_username))
 
     if not user:
         raise credentials_exception

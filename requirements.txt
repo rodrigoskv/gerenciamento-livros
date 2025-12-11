@@ -6,7 +6,7 @@ cffi==1.17.1
 argon2-cffi-bindings==21.2.0
 argon2-cffi==23.1.0
 pwdlib==0.2.1
-SQLAlchemy
+SQLAlchemy==2.0
 uvicorn
 fastapi
 python-multipart
@@ -15,3 +15,4 @@ PyMySQL==1.1.1
 bcrypt==4.3.0
 passlib>=1.7.4
 sqlalchemy-utils>=0.41
+aiosqlite
